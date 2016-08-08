@@ -171,7 +171,7 @@ joinChannel : Channel msg -> Socket msg -> ( Socket msg, Cmd (Msg msg) )
 joinChannel channel socket =
   let
     push' =
-      Push "phx_join" channel.name channel.payload channel.onJoin channel.onError
+      Push "phx_join" channel.name channel.payload channel.onJoin channel.onError Nothing
 
     channel' =
       { channel | state = Channel.Joining, joinRef = socket.ref }
@@ -447,6 +447,9 @@ handlePhxReply socket message =
 
             "error" ->
               Maybe.map (\f -> (ExternalMsg << f) response) push.onError
+
+            "reply" ->
+              Maybe.map (\f -> (ExternalMsg << f) response) push.onReply
 
             _ ->
               Nothing

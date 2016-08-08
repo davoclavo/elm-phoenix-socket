@@ -1,8 +1,8 @@
-module Phoenix.Push exposing (Push, init, withPayload, onError, onOk)
+module Phoenix.Push exposing (Push, init, withPayload, onError, onOk, onReply)
 
 {-|
 
-@docs Push, init, withPayload, onError, onOk
+@docs Push, init, withPayload, onError, onOk, onReply
 
 -}
 
@@ -18,6 +18,7 @@ type alias Push msg =
   , payload : JE.Value
   , onOk : Maybe (JE.Value -> msg)
   , onError : Maybe (JE.Value -> msg)
+  , onReply : Maybe (JE.Value -> msg)
   }
 
 
@@ -28,7 +29,7 @@ type alias Push msg =
 -}
 init : String -> String -> Push msg
 init event channel =
-  Push event channel emptyPayload Nothing Nothing
+  Push event channel emptyPayload Nothing Nothing Nothing
 
 
 {-| Attaches a payload
@@ -63,3 +64,14 @@ onOk valueToMsg push =
 onError : (JE.Value -> msg) -> Push msg -> Push msg
 onError valueToMsg push =
   { push | onError = Just valueToMsg }
+
+
+{-| Attaches a reply handler
+
+    init "new:msg" "rooms:lobby"
+      |> onReply HandlePushReply
+
+-}
+onReply : (JE.Value -> msg) -> Push msg -> Push msg
+onReply valueToMsg push =
+  { push | onReply = Just valueToMsg }
